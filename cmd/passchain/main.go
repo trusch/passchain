@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/trusch/passchain/cmd/cli/cmd"
+import "github.com/trusch/passchain/cmd/passchain/cmd"
 
 func main() {
 	cmd.Execute()

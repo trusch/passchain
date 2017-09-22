@@ -22,6 +22,8 @@ import (
 	"github.com/trusch/passchain/state"
 )
 
+var secretData string
+
 // secretAddCmd represents the secretAdd command
 var secretAddCmd = &cobra.Command{
 	Use:   "add",
@@ -34,7 +36,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		sid := viper.GetString("sid")
-		data := viper.GetString("data")
+		data := secretData
 		if sid == "" || data == "" {
 			log.Fatal("you must specify --sid and --data")
 		}
@@ -60,9 +62,7 @@ to quickly create a Cobra application.`,
 
 func init() {
 	secretCmd.AddCommand(secretAddCmd)
-	secretAddCmd.PersistentFlags().String("data", "", "secret value")
-	viper.BindPFlags(secretAddCmd.PersistentFlags())
-
+	secretAddCmd.Flags().StringVar(&secretData, "data", "", "secret value")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command

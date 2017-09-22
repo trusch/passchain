@@ -54,7 +54,7 @@ func (app *PersistentApplication) SetLogger(l log.Logger) {
 	app.logger = l
 }
 
-func (app *PersistentApplication) Info() (resInfo types.ResponseInfo) {
+func (app *PersistentApplication) Info(req types.RequestInfo) (resInfo types.ResponseInfo) {
 	resInfo = app.app.Info()
 	lastBlock := LoadLastBlock(app.db)
 	resInfo.LastBlockHeight = lastBlock.Height
@@ -105,8 +105,8 @@ func (app *PersistentApplication) Query(reqQuery types.RequestQuery) types.Respo
 }
 
 // Save the validators in the merkle tree
-func (app *PersistentApplication) InitChain(validators []*types.Validator) {
-	for _, v := range validators {
+func (app *PersistentApplication) InitChain(req types.RequestInitChain) {
+	for _, v := range req.GetValidators() {
 		r := app.updateValidator(v)
 		if r.IsErr() {
 			app.logger.Error("Error updating validators", "r", r)
@@ -115,9 +115,9 @@ func (app *PersistentApplication) InitChain(validators []*types.Validator) {
 }
 
 // Track the block hash and header information
-func (app *PersistentApplication) BeginBlock(hash []byte, header *types.Header) {
+func (app *PersistentApplication) BeginBlock(req types.RequestBeginBlock) {
 	// update latest block info
-	app.blockHeader = header
+	app.blockHeader = req.GetHeader()
 
 	// reset valset changes
 	app.changes = make([]*types.Validator, 0)

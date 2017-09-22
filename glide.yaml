@@ -1,0 +1,45 @@
+package: github.com/trusch/passchain
+import:
+- package: github.com/mitchellh/go-homedir
+- package: github.com/mitchellh/mapstructure
+- package: github.com/pkg/errors
+  version: ^0.8.0
+- package: github.com/spf13/cobra
+- package: github.com/spf13/viper
+  version: ^1.0.0
+- package: github.com/tendermint/abci
+  version: ^0.6.0
+  subpackages:
+  - server
+  - types
+- package: github.com/tendermint/go-wire
+  version: ^0.6.2
+- package: github.com/tendermint/merkleeyes
+  version: ^0.2.4
+  subpackages:
+  - iavl
+- package: github.com/tendermint/tendermint
+  version: ^0.11.0
+  subpackages:
+  - rpc/client
+  - types
+- package: github.com/tendermint/tmlibs
+  version: ^0.3.1
+  subpackages:
+  - common
+  - db
+  - log
+  - merkle
+- package: github.com/trusch/storage
+  version: develop
+  subpackages:
+  - filter/encryption/ecdhe
+- package: golang.org/x/crypto
+  subpackages:
+  - sha3
+- package: gopkg.in/yaml.v2
+testImport:
+- package: github.com/onsi/ginkgo
+  version: ^1.4.0
+- package: github.com/onsi/gomega
+  version: ^1.2.0
