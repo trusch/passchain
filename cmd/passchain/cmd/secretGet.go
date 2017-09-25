@@ -44,11 +44,11 @@ var secretGetCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		encryptedAESKey, ok := secret.Shares[viper.GetString("id")]
+		encryptedAESKey, ok := secret.Shares[cli.AccountID]
 		if !ok {
 			log.Fatal("no share for us on this secret")
 		}
-		k := getKey()
+		k := cli.Key
 		aesKey, err := k.DecryptString(encryptedAESKey)
 		if err != nil {
 			log.Fatal(err)
@@ -63,13 +63,4 @@ var secretGetCmd = &cobra.Command{
 
 func init() {
 	secretCmd.AddCommand(secretGetCmd)
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// secretGetCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// secretGetCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

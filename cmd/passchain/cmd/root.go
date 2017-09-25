@@ -63,14 +63,12 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
 	RootCmd.PersistentFlags().String("public-key", "", "public key")
 	RootCmd.PersistentFlags().String("private-key", "", "private key")
 	RootCmd.PersistentFlags().String("id", "", "id of account")
 	RootCmd.PersistentFlags().String("format", "yaml", "output format")
+	RootCmd.PersistentFlags().String("as", "", "group account to use")
 
 	viper.BindPFlags(RootCmd.PersistentFlags())
 	viper.BindEnv("id", "PASSCHAIN_ID")
@@ -118,7 +116,38 @@ func getKey() *crypto.Key {
 }
 
 func getCli() *client.Client {
-	return client.NewHTTPClient("http://localhost:46657", getKey(), viper.GetString("id"))
+	ownID := viper.GetString("id")
+	cli := client.NewHTTPClient("http://localhost:46657", getKey(), ownID)
+	if as := viper.GetString("as"); as != "" {
+		asAccount, err := cli.GetAccount(as)
+		if err != nil {
+			log.Fatal("cannot find account: ", err)
+		}
+		privkeySecret, err := cli.GetSecret(as)
+		if err != nil {
+			log.Fatal("cannot find shared account secret: ", err)
+		}
+		encryptedAESKey, ok := privkeySecret.Shares[ownID]
+		if !ok {
+			log.Fatal("no share for us on this secret")
+		}
+		k := getKey()
+		aesKey, err := k.DecryptString(encryptedAESKey)
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = privkeySecret.Decrypt(aesKey)
+		if err != nil {
+			log.Fatal(err)
+		}
+		key, err := crypto.NewFromStrings(asAccount.PubKey, string(privkeySecret.Value))
+		if err != nil {
+			log.Fatal(err)
+		}
+		cli.Key = key
+		cli.AccountID = as
+	}
+	return cli
 }
 
 func print(data interface{}) {

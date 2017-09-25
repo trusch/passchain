@@ -48,7 +48,7 @@ var secretShareCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		encryptedAESKey, ok := secret.Shares[viper.GetString("id")]
+		encryptedAESKey, ok := secret.Shares[cli.AccountID]
 		if !ok {
 			log.Fatal("no share for us on this secret")
 		}
@@ -86,13 +86,4 @@ func init() {
 	secretShareCmd.Flags().String("with", "", "who to share with")
 	secretShareCmd.Flags().Bool("owner", false, "share owner rights (read only if false)")
 	viper.BindPFlags(secretShareCmd.Flags())
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// secretShareCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// secretShareCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

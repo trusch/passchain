@@ -1,5 +1,5 @@
-hash: 5c0d20947d362ed614de27c06d926589ec7a06c5465b8306f96d1417df06e0b7
-updated: 2017-09-22T23:43:20.358313094+02:00
+hash: b215781b7050bdfa95de160fd014250ecafe95cddb46d11a22fc47a268f0661e
+updated: 2017-09-25T14:00:10.090337237+02:00
 imports:
 - name: github.com/btcsuite/btcd
   version: 4803a8291c92a1d2d41041b942a9a9e37deab065
@@ -110,7 +110,7 @@ imports:
   - edwards25519
   - extra25519
 - name: github.com/tendermint/go-crypto
-  version: 311e8c1bf00fa5868daad4f8ea56dcad539182c0
+  version: 0418d32276d7d0f080e4c0e58b49c6ba2f717954
 - name: github.com/tendermint/go-wire
   version: 5f88da3dbc1a72844e6dfaf274ce87f851d488eb
   subpackages:

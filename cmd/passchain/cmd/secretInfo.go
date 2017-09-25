@@ -43,8 +43,8 @@ var secretInfoCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		if encryptedAESKey, ok := secret.Shares[viper.GetString("id")]; ok {
-			k := getKey()
+		if encryptedAESKey, ok := secret.Shares[cli.AccountID]; ok {
+			k := cli.Key
 			aesKey, err := k.DecryptString(encryptedAESKey)
 			if err != nil {
 				log.Fatal(err)
@@ -60,13 +60,4 @@ var secretInfoCmd = &cobra.Command{
 
 func init() {
 	secretCmd.AddCommand(secretInfoCmd)
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// secretInfoCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// secretInfoCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

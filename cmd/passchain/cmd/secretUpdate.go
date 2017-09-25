@@ -35,7 +35,7 @@ var secretUpdateCmd = &cobra.Command{
 	Long:  `Update a secrets value but retain the shares`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cli := getCli()
-		key := getKey()
+		key := cli.Key
 		sid := viper.GetString("sid")
 		if sid == "" && len(args) > 0 {
 			sid = args[0]
@@ -49,11 +49,11 @@ var secretUpdateCmd = &cobra.Command{
 		}
 		sec, err := cli.GetSecret(sid)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("failed to get secret: %v", err)
 		}
 		aesKey, err := key.DecryptString(sec.Shares[cli.AccountID])
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("failed to decrypt secret: %v", err)
 		}
 		sec.Value = data
 		err = sec.EncryptWithKey(aesKey)
@@ -71,13 +71,4 @@ func init() {
 	secretCmd.AddCommand(secretUpdateCmd)
 	secretUpdateCmd.PersistentFlags().String("data", "", "secret value")
 	viper.BindPFlags(secretUpdateCmd.PersistentFlags())
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// secretUpdateCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// secretUpdateCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

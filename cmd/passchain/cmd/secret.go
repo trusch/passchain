@@ -32,22 +32,10 @@ var secretCmd = &cobra.Command{
 	Aliases: []string{"secrets", "password", "passwords"},
 	Short:   "secret related commands",
 	Long:    `Here you can create, delete update and share secrets.`,
-	// Run: func(cmd *cobra.Command, args []string) {
-	// 	fmt.Println("secret called")
-	// },
 }
 
 func init() {
 	RootCmd.AddCommand(secretCmd)
 	secretCmd.PersistentFlags().String("sid", "", "secret id")
 	viper.BindPFlags(secretCmd.PersistentFlags())
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// secretCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// secretCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

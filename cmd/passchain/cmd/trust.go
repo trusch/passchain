@@ -34,13 +34,13 @@ var trustCmd = &cobra.Command{
 	Short: "give reputation to an account",
 	Long:  `Trust allows you to give reputation to an account. Valid values are from -3 to +3.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		from := viper.GetString("id")
+		cli := getCli()
+		from := cli.AccountID
 		to := viper.GetString("to")
 		if len(args) > 0 {
 			to = args[0]
 		}
 		value := viper.GetInt("value")
-		cli := getCli()
 		err := cli.GiveReputation(from, to, value)
 		if err != nil {
 			log.Fatal(err)
@@ -53,13 +53,4 @@ func init() {
 	trustCmd.PersistentFlags().String("to", "", "who is trusted")
 	trustCmd.PersistentFlags().Int("value", 1, "-1, 0 or +1")
 	viper.BindPFlags(trustCmd.PersistentFlags())
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// trustCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// trustCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
