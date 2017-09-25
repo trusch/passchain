@@ -1,0 +1,25 @@
+name: passchain
+synopsis: A blockchain based password sharing application
+description: "Passchain lets you create and share secrets with your team.\n\nIt is
+  based on the tendermint blockchain and handles accounts and secrets.\n\t"
+options:
+- name: as
+  usage: group account to use
+- name: config
+  usage: config file (default is $HOME/.cli.yaml)
+- name: format
+  default_value: yaml
+  usage: output format
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for passchain
+- name: id
+  usage: id of account
+- name: private-key
+  usage: private key
+- name: public-key
+  usage: public key
+see_also:
+- account - account related commands
+- secret - secret related commands

@@ -1,0 +1,24 @@
+name: passchain account create
+synopsis: create a account
+description: Here you can create a new account
+options:
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for create
+inherited_options:
+- name: as
+  usage: group account to use
+- name: config
+  usage: config file (default is $HOME/.cli.yaml)
+- name: format
+  default_value: yaml
+  usage: output format
+- name: id
+  usage: id of account
+- name: private-key
+  usage: private key
+- name: public-key
+  usage: public key
+see_also:
+- passchain account - account related commands

@@ -1,0 +1,29 @@
+name: passchain account
+synopsis: account related commands
+description: Here you can create, get, delete and list accounts.
+options:
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for account
+inherited_options:
+- name: as
+  usage: group account to use
+- name: config
+  usage: config file (default is $HOME/.cli.yaml)
+- name: format
+  default_value: yaml
+  usage: output format
+- name: id
+  usage: id of account
+- name: private-key
+  usage: private key
+- name: public-key
+  usage: public key
+see_also:
+- passchain - A blockchain based password sharing application
+- create - create a account
+- delete - delete an account
+- get - get account data
+- list - list accounts
+- trust - give reputation to an account

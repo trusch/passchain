@@ -1,0 +1,30 @@
+name: passchain account trust
+synopsis: give reputation to an account
+description: |
+  Trust allows you to give reputation to an account. Valid values are from -3 to +3.
+options:
+- name: help
+  shorthand: h
+  default_value: "false"
+  usage: help for trust
+- name: to
+  usage: who is trusted
+- name: value
+  default_value: "1"
+  usage: -1, 0 or +1
+inherited_options:
+- name: as
+  usage: group account to use
+- name: config
+  usage: config file (default is $HOME/.cli.yaml)
+- name: format
+  default_value: yaml
+  usage: output format
+- name: id
+  usage: id of account
+- name: private-key
+  usage: private key
+- name: public-key
+  usage: public key
+see_also:
+- passchain account - account related commands
