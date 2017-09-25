@@ -3,6 +3,7 @@ package client
 import (
 	"encoding/json"
 	"errors"
+	"log"
 
 	"github.com/tendermint/tendermint/rpc/client"
 	"github.com/tendermint/tendermint/types"
@@ -90,6 +91,38 @@ func (c *Client) GetAccount(id string) (*state.Account, error) {
 	}
 	acc := &state.Account{}
 	if err = json.Unmarshal(resp.Value, acc); err != nil {
+		return nil, err
+	}
+	return acc, nil
+}
+
+func (c *Client) ListAccounts() ([]*state.Account, error) {
+	resp, err := c.tm.ABCIQuery("/account", nil, false)
+	if err != nil {
+		log.Print(err)
+		return nil, err
+	}
+	if len(resp.Value) == 0 {
+		return nil, errors.New("account not found")
+	}
+	acc := []*state.Account{}
+	if err = json.Unmarshal(resp.Value, &acc); err != nil {
+		return nil, err
+	}
+	return acc, nil
+}
+
+func (c *Client) ListSecrets() ([]*state.Secret, error) {
+	resp, err := c.tm.ABCIQuery("/secret", nil, false)
+	if err != nil {
+		log.Print(err)
+		return nil, err
+	}
+	if len(resp.Value) == 0 {
+		return nil, errors.New("secret not found")
+	}
+	acc := []*state.Secret{}
+	if err = json.Unmarshal(resp.Value, &acc); err != nil {
 		return nil, err
 	}
 	return acc, nil

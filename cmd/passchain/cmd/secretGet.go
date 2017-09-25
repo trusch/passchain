@@ -25,15 +25,13 @@ import (
 // secretGetCmd represents the secretGet command
 var secretGetCmd = &cobra.Command{
 	Use:   "get",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "get the value of a secret",
+	Long:  `Get a secret, decrypt and print the value.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		sid := viper.GetString("sid")
+		if len(args) > 0 {
+			sid = args[0]
+		}
 		cli := getCli()
 		secret, err := cli.GetSecret(sid)
 		if err != nil {

@@ -15,10 +15,7 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
-
-	yaml "gopkg.in/yaml.v2"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -27,21 +24,19 @@ import (
 // getAccountCmd represents the getAccount command
 var getAccountCmd = &cobra.Command{
 	Use:   "get",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "get account data",
+	Long:  `Get account data.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cli := getCli()
-		acc, err := cli.GetAccount(viper.GetString("id"))
+		id := viper.GetString("id")
+		if len(args) > 0 {
+			id = args[0]
+		}
+		acc, err := cli.GetAccount(id)
 		if err != nil {
 			log.Fatal(err)
 		}
-		bs, _ := yaml.Marshal(acc)
-		fmt.Print(string(bs))
+		print(acc)
 	},
 }
 

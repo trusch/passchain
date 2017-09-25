@@ -15,31 +15,36 @@
 package cmd
 
 import (
+	"log"
+
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-// secretCmd represents the secret command
-var secretCmd = &cobra.Command{
-	Use:   "secret",
-	Short: "secret related commands",
-	Long:  `Here you can create, delete update and share secrets.`,
-	// Run: func(cmd *cobra.Command, args []string) {
-	// 	fmt.Println("secret called")
-	// },
+// listAccountCmd represents the listAccount command
+var listAccountCmd = &cobra.Command{
+	Use:   "list",
+	Short: "list accounts",
+	Long:  `List accounts.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		cli := getCli()
+		accs, err := cli.ListAccounts()
+		if err != nil {
+			log.Fatal(err)
+		}
+		print(accs)
+	},
 }
 
 func init() {
-	RootCmd.AddCommand(secretCmd)
-	secretCmd.PersistentFlags().String("sid", "", "secret id")
-	viper.BindPFlags(secretCmd.PersistentFlags())
+	accountCmd.AddCommand(listAccountCmd)
+
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// secretCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// listAccountCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// secretCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// listAccountCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

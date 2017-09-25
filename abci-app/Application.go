@@ -150,24 +150,44 @@ func (app *Application) Query(reqQuery types.RequestQuery) (resQuery types.Respo
 	switch reqQuery.Path {
 	case "/account":
 		{
-			acc, err := app.state.GetAccount(string(reqQuery.Data))
+			var (
+				result interface{}
+				err    error
+			)
+			if reqQuery.Data == nil {
+				result, err = app.state.ListAccounts()
+				log.Printf("got account list: %+v", result)
+			} else {
+				result, err = app.state.GetAccount(string(reqQuery.Data))
+				log.Printf("got account: %+v", result)
+			}
 			if err != nil {
 				resQuery.Code = types.CodeType_BaseInvalidInput
 				resQuery.Log = err.Error()
 				return
 			}
-			bs, _ := json.Marshal(acc)
+			bs, _ := json.Marshal(result)
 			resQuery.Value = bs
 		}
 	case "/secret":
 		{
-			acc, err := app.state.GetSecret(string(reqQuery.Data))
+			var (
+				result interface{}
+				err    error
+			)
+			if reqQuery.Data == nil {
+				result, err = app.state.ListSecrets()
+				log.Printf("got secret list: %+v", result)
+			} else {
+				result, err = app.state.GetSecret(string(reqQuery.Data))
+				log.Printf("got secret: %+v", result)
+			}
 			if err != nil {
 				resQuery.Code = types.CodeType_BaseInvalidInput
 				resQuery.Log = err.Error()
 				return
 			}
-			bs, _ := json.Marshal(acc)
+			bs, _ := json.Marshal(result)
 			resQuery.Value = bs
 		}
 	default:

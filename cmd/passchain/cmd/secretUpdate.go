@@ -25,18 +25,19 @@ import (
 // secretUpdateCmd represents the secretUpdate command
 var secretUpdateCmd = &cobra.Command{
 	Use:   "update",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "update a secret",
+	Long:  `Update a secrets value but retain the shares`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cli := getCli()
 		key := getKey()
 		sid := viper.GetString("sid")
-		data := viper.GetString("data")
+		if len(args) > 0 {
+			sid = args[0]
+		}
+		data := secretData
+		if data == "" && len(args) > 1 {
+			data = args[1]
+		}
 		if sid == "" || data == "" {
 			log.Fatal("you must specify --sid and --data")
 		}

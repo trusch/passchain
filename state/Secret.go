@@ -7,10 +7,65 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"io"
 	"io/ioutil"
 )
+
+func (s *State) AddSecret(secret *Secret) error {
+	if s.HasSecret(secret.ID) {
+		return errors.New("secret already exists")
+	}
+	return s.SetSecret(secret)
+}
+
+func (s *State) SetSecret(secret *Secret) error {
+	bs, err := json.Marshal(secret)
+	if err != nil {
+		return err
+	}
+	s.Tree.Set([]byte(secretPrefix+secret.ID), bs)
+	return nil
+}
+
+func (s *State) HasSecret(id string) bool {
+	return s.Tree.Has([]byte(secretPrefix + id))
+}
+
+func (s *State) GetSecret(id string) (*Secret, error) {
+	_, bs, exists := s.Tree.Get([]byte(secretPrefix + id))
+	if !exists {
+		return nil, errors.New("no such secret")
+	}
+	acc := &Secret{Shares: make(map[string]string)}
+	return acc, json.Unmarshal(bs, acc)
+}
+
+func (s *State) DeleteSecret(id string) error {
+	_, removed := s.Tree.Remove([]byte(secretPrefix + id))
+	if !removed {
+		return errors.New("no such secret")
+	}
+	return nil
+}
+
+func (s *State) ListSecrets() (result []*Secret, err error) {
+	start := secretPrefix
+	end := start[:len(start)-1]
+	end = end + string(start[len(start)-1]+1)
+	result = make([]*Secret, 0)
+	s.Tree.IterateRange([]byte(start), []byte(end), true, func(key []byte, value []byte) bool {
+		acc := &Secret{}
+		err = json.Unmarshal(value, acc)
+		if err != nil {
+			return true
+		}
+		result = append(result, acc)
+		return false
+	})
+	return
+}
 
 func (secret *Secret) Encrypt() (aesKey []byte, err error) {
 	k := make([]byte, 32)

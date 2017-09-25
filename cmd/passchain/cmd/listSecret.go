@@ -15,31 +15,47 @@
 package cmd
 
 import (
+	"log"
+
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-// secretCmd represents the secret command
-var secretCmd = &cobra.Command{
-	Use:   "secret",
-	Short: "secret related commands",
-	Long:  `Here you can create, delete update and share secrets.`,
-	// Run: func(cmd *cobra.Command, args []string) {
-	// 	fmt.Println("secret called")
-	// },
+// listSecretCmd represents the listSecret command
+var listSecretCmd = &cobra.Command{
+	Use:   "list",
+	Short: "list secrets",
+	Long:  `List secrets and decrypt if possible.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		cli := getCli()
+		secrets, err := cli.ListSecrets()
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, s := range secrets {
+			if encryptedKey, ok := s.Shares[cli.AccountID]; ok {
+				key, e := cli.Key.DecryptString(encryptedKey)
+				if e != nil {
+					log.Fatal(e)
+				}
+				if e = s.Decrypt(key); e != nil {
+					log.Fatal(e)
+				}
+			}
+		}
+		print(secrets)
+	},
 }
 
 func init() {
-	RootCmd.AddCommand(secretCmd)
-	secretCmd.PersistentFlags().String("sid", "", "secret id")
-	viper.BindPFlags(secretCmd.PersistentFlags())
+	secretCmd.AddCommand(listSecretCmd)
+
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// secretCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// listSecretCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// secretCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// listSecretCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

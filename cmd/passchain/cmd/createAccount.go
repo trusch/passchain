@@ -27,17 +27,15 @@ import (
 // createAccountCmd represents the createAccount command
 var createAccountCmd = &cobra.Command{
 	Use:   "create",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "create a account",
+	Long:  `Here you can create a new account`,
 	Run: func(cmd *cobra.Command, args []string) {
 		id := viper.GetString("id")
 		if id == "" {
 			log.Fatal("you must specify --id")
+		}
+		if len(args) > 0 {
+			id = args[0]
 		}
 		cli := getCli()
 		key, err := crypto.CreateKeyPair()

@@ -15,9 +15,12 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+
+	yaml "gopkg.in/yaml.v2"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
@@ -30,14 +33,12 @@ var cfgFile string
 
 // RootCmd represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "cli",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Use:   "passchain",
+	Short: "A blockchain based password sharing application",
+	Long: `Passchain lets you create and share secrets with your team.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+It is based on the tendermint blockchain and handles accounts and secrets.
+	`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	//	Run: func(cmd *cobra.Command, args []string) { },
@@ -62,6 +63,7 @@ func init() {
 	RootCmd.PersistentFlags().String("public-key", "", "public key")
 	RootCmd.PersistentFlags().String("private-key", "", "private key")
 	RootCmd.PersistentFlags().String("id", "", "id of account")
+	RootCmd.PersistentFlags().String("format", "yaml", "output format")
 
 	viper.BindPFlags(RootCmd.PersistentFlags())
 	viper.BindEnv("id", "PASSCHAIN_ID")
@@ -110,4 +112,34 @@ func getKey() *crypto.Key {
 
 func getCli() *client.Client {
 	return client.NewHTTPClient("http://localhost:46657", getKey(), viper.GetString("id"))
+}
+
+func print(data interface{}) {
+	format := viper.GetString("format")
+	var (
+		bs  []byte
+		err error
+	)
+	switch format {
+	case "yaml":
+		{
+			bs, err = yaml.Marshal(data)
+		}
+	case "json":
+		{
+			bs, err = json.Marshal(data)
+		}
+	case "pretty-json":
+		{
+			bs, err = json.MarshalIndent(data, "", "  ")
+		}
+	default:
+		{
+			log.Fatal("wrong format")
+		}
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Print(string(bs))
 }
