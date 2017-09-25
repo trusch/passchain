@@ -35,10 +35,10 @@ import (
 )
 
 type Secret struct {
-	ID     string `json:"id" mapstructure:"id"`
-	Value  string
-	Shares map[string]string
-	Owners map[string]bool
+	ID     string            `json:"id" mapstructure:"id"`
+	Value  string            `json:"value" mapstructure:"value"`
+	Shares map[string]string `json:"shares" mapstructure:"shares"`
+	Owners map[string]bool   `json:"owners" mapstructure:"owners"`
 }
 
 func (s *State) AddSecret(secret *Secret) error {

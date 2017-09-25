@@ -26,7 +26,7 @@ import (
 	"os"
 
 	"github.com/tendermint/abci/server"
-	cmn "github.com/tendermint/tmlibs/common"
+	"github.com/tendermint/tmlibs/common"
 	"github.com/tendermint/tmlibs/log"
 	mapp "github.com/trusch/passchain/abci-app"
 )
@@ -35,12 +35,13 @@ func main() {
 
 	addrPtr := flag.String("addr", "tcp://0.0.0.0:46658", "Listen address")
 	abciPtr := flag.String("abci", "socket", "socket | grpc")
+	storePtr := flag.String("store", "app.ldb", "store path")
 	flag.Parse()
 
 	logger := log.NewTMLogger(log.NewSyncWriter(os.Stdout))
 
 	// Create the application - in memory or persisted to disk
-	app := mapp.NewPersistentApplication("app.ldb")
+	app := mapp.NewPersistentApplication(*storePtr)
 
 	// Start the listener
 	srv, err := server.NewServer(*addrPtr, *abciPtr, app)
@@ -55,7 +56,7 @@ func main() {
 	}
 
 	// Wait forever
-	cmn.TrapSignal(func() {
+	common.TrapSignal(func() {
 		// Cleanup
 		srv.Stop()
 	})
