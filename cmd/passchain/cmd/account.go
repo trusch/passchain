@@ -27,9 +27,10 @@ import (
 
 // accountCmd represents the account command
 var accountCmd = &cobra.Command{
-	Use:   "account",
-	Short: "account related commands",
-	Long:  `Here you can create, get, delete and list accounts.`,
+	Use:     "account",
+	Aliases: []string{"accounts"},
+	Short:   "account related commands",
+	Long:    `Here you can create, get, delete and list accounts.`,
 	// Run: func(cmd *cobra.Command, args []string) {
 	// 	fmt.Println("account called")
 	// },

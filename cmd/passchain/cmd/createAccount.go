@@ -33,9 +33,10 @@ import (
 
 // createAccountCmd represents the createAccount command
 var createAccountCmd = &cobra.Command{
-	Use:   "create",
-	Short: "create a account",
-	Long:  `Here you can create a new account`,
+	Use:     "create",
+	Aliases: []string{"add"},
+	Short:   "create a account",
+	Long:    `Here you can create a new account`,
 	Run: func(cmd *cobra.Command, args []string) {
 		id := viper.GetString("id")
 		if id == "" {
@@ -55,7 +56,7 @@ var createAccountCmd = &cobra.Command{
 		}
 		log.Print("successfully created account ", id)
 		log.Print("you may wish to set these env variables:")
-		fmt.Printf("export PASSCHAIN_ID=%v\n", cli.AccountID)
+		fmt.Printf("export PASSCHAIN_ID=%v\n", id)
 		fmt.Printf("export PASSCHAIN_PUBLIC_KEY=%v\n", cli.Key.GetPubString())
 		fmt.Printf("export PASSCHAIN_PRIVATE_KEY=%v\n", cli.Key.GetPrivString())
 	},

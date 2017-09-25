@@ -26,7 +26,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/trusch/passchain/state"
 )
 
 // secretUpdateCmd represents the secretUpdate command
@@ -38,7 +37,7 @@ var secretUpdateCmd = &cobra.Command{
 		cli := getCli()
 		key := getKey()
 		sid := viper.GetString("sid")
-		if len(args) > 0 {
+		if sid == "" && len(args) > 0 {
 			sid = args[0]
 		}
 		data := secretData
@@ -48,20 +47,20 @@ var secretUpdateCmd = &cobra.Command{
 		if sid == "" || data == "" {
 			log.Fatal("you must specify --sid and --data")
 		}
-		oldSecret, err := cli.GetSecret(sid)
+		sec, err := cli.GetSecret(sid)
 		if err != nil {
 			log.Fatal(err)
 		}
-		aesKey, err := key.DecryptString(oldSecret.Shares[cli.AccountID])
+		aesKey, err := key.DecryptString(sec.Shares[cli.AccountID])
 		if err != nil {
 			log.Fatal(err)
 		}
-		s := &state.Secret{ID: sid, Value: data, Shares: oldSecret.Shares}
-		err = s.EncryptWithKey(aesKey)
+		sec.Value = data
+		err = sec.EncryptWithKey(aesKey)
 		if err != nil {
 			log.Fatal(err)
 		}
-		if err := cli.UpdateSecret(s); err != nil {
+		if err := cli.UpdateSecret(sec); err != nil {
 			log.Fatal(err)
 		}
 		log.Printf("updated secret %v", sid)

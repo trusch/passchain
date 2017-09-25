@@ -44,6 +44,9 @@ func checkSecretDelTransaction(tx *transaction.Transaction, state *state.State) 
 	if _, ok := secret.Shares[data.SenderID]; !ok {
 		return errors.New("sender has no share on this secret")
 	}
+	if _, ok := secret.Owners[data.SenderID]; !ok {
+		return errors.New("sender is not owner of this secret")
+	}
 	k, err := state.GetAccountPubKey(data.SenderID)
 	if err != nil {
 		return errors.New("pubkey can't be loaded: " + err.Error())

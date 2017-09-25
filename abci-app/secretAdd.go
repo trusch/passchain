@@ -40,6 +40,9 @@ func checkSecretAddTransaction(tx *transaction.Transaction, state *state.State) 
 	if len(data.Secret.Shares) == 0 {
 		return errors.New("no shares supplied")
 	}
+	if len(data.Secret.Owners) == 0 {
+		return errors.New("no owners supplied")
+	}
 	return nil
 }
 

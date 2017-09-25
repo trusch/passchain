@@ -26,4 +26,5 @@ type SecretShareData struct {
 	SenderID  string
 	AccountID string
 	Key       string
+	IsOwner   bool
 }

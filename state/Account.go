@@ -34,12 +34,6 @@ type Account struct {
 	Reputation map[string]int `json:"reputation" mapstructure:"reputation"`
 }
 
-type Secret struct {
-	ID     string `json:"id" mapstructure:"id"`
-	Value  string
-	Shares map[string]string
-}
-
 func (s *State) AddAccount(account *Account) error {
 	if s.HasAccount(account.ID) {
 		return errors.New("account already exists")

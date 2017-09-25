@@ -26,73 +26,66 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/trusch/passchain/crypto"
+	"github.com/trusch/passchain/state"
 )
 
-// secretShareCmd represents the secretShare command
-var secretShareCmd = &cobra.Command{
-	Use:   "share",
-	Short: "share a secret",
-	Long:  `Share a secret with another account.`,
+var secretData string
+
+// secretAddCmd represents the secretAdd command
+var secretAddCmd = &cobra.Command{
+	Use:     "create",
+	Aliases: []string{"add"},
+	Short:   "create a secret",
+	Long:    `Create a secret.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cli := getCli()
 		sid := viper.GetString("sid")
 		if len(args) > 0 {
 			sid = args[0]
 		}
-		with := viper.GetString("with")
-		if len(args) > 1 {
-			with = args[1]
+		data := secretData
+		if data == "" && len(args) > 1 {
+			data = args[1]
 		}
-		secret, err := cli.GetSecret(sid)
+		if sid == "" || data == "" {
+			log.Fatal("you must specify --sid and --data")
+		}
+		ownID := viper.GetString("id")
+		s := &state.Secret{
+			ID:     sid,
+			Value:  data,
+			Shares: make(map[string]string),
+			Owners: map[string]bool{
+				ownID: true,
+			},
+		}
+		aesKey, err := s.Encrypt()
 		if err != nil {
 			log.Fatal(err)
-		}
-		encryptedAESKey, ok := secret.Shares[viper.GetString("id")]
-		if !ok {
-			log.Fatal("no share for us on this secret")
 		}
 		k := getKey()
-		aesKey, err := k.DecryptString(encryptedAESKey)
+		encryptedAESKey, err := k.EncryptToString(aesKey)
 		if err != nil {
 			log.Fatal(err)
 		}
-		acc, err := cli.GetAccount(with)
-		if err != nil {
-			log.Print("can not find account " + with)
+		s.Shares[ownID] = encryptedAESKey
+		cli := getCli()
+		if err := cli.AddSecret(s); err != nil {
 			log.Fatal(err)
 		}
-		otherKey, err := crypto.NewFromStrings(acc.PubKey, "")
-		if err != nil {
-			log.Fatal(err)
-		}
-		otherEncrptedAESKey, err := otherKey.EncryptToString(aesKey)
-		if err != nil {
-			log.Fatal(err)
-		}
-		secret.Shares[with] = otherEncrptedAESKey
-		if viper.GetBool("owner") {
-			secret.Owners[with] = true
-		}
-		err = cli.UpdateSecret(secret)
-		if err != nil {
-			log.Fatal(err)
-		}
+		log.Printf("created secret %v", sid)
 	},
 }
 
 func init() {
-	secretCmd.AddCommand(secretShareCmd)
-	secretShareCmd.Flags().String("with", "", "who to share with")
-	secretShareCmd.Flags().Bool("owner", false, "share owner rights (read only if false)")
-	viper.BindPFlags(secretShareCmd.Flags())
+	secretCmd.AddCommand(secretAddCmd)
+	secretAddCmd.Flags().StringVar(&secretData, "data", "", "secret value")
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// secretShareCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// secretAddCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// secretShareCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// secretAddCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

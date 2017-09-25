@@ -30,9 +30,10 @@ import (
 
 // secretDelCmd represents the secretDel command
 var secretDelCmd = &cobra.Command{
-	Use:   "delete",
-	Short: "delete a secret",
-	Long:  `Delete a secret.`,
+	Use:     "delete",
+	Aliases: []string{"remove", "del"},
+	Short:   "delete a secret",
+	Long:    `Delete a secret.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cli := getCli()
 		id := viper.GetString("sid")

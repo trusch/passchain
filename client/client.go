@@ -210,7 +210,6 @@ func (c *Client) UpdateSecret(acc *state.Secret) error {
 	if err := tx.Sign(c.Key); err != nil {
 		return err
 	}
-
 	bs, _ := tx.ToBytes()
 	res, err := c.tm.BroadcastTxCommit(types.Tx(bs))
 	if err != nil {

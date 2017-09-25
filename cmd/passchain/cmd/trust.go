@@ -36,6 +36,9 @@ var trustCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		from := viper.GetString("id")
 		to := viper.GetString("to")
+		if len(args) > 0 {
+			to = args[0]
+		}
 		value := viper.GetInt("value")
 		cli := getCli()
 		err := cli.GiveReputation(from, to, value)

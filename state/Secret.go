@@ -34,6 +34,13 @@ import (
 	"io/ioutil"
 )
 
+type Secret struct {
+	ID     string `json:"id" mapstructure:"id"`
+	Value  string
+	Shares map[string]string
+	Owners map[string]bool
+}
+
 func (s *State) AddSecret(secret *Secret) error {
 	if s.HasSecret(secret.ID) {
 		return errors.New("secret already exists")

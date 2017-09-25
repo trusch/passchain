@@ -28,9 +28,10 @@ import (
 
 // secretCmd represents the secret command
 var secretCmd = &cobra.Command{
-	Use:   "secret",
-	Short: "secret related commands",
-	Long:  `Here you can create, delete update and share secrets.`,
+	Use:     "secret",
+	Aliases: []string{"secrets", "password", "passwords"},
+	Short:   "secret related commands",
+	Long:    `Here you can create, delete update and share secrets.`,
 	// Run: func(cmd *cobra.Command, args []string) {
 	// 	fmt.Println("secret called")
 	// },

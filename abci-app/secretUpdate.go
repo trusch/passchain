@@ -23,7 +23,6 @@ package app
 
 import (
 	"errors"
-	"log"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/trusch/passchain/state"
@@ -40,8 +39,6 @@ func checkSecretUpdateTransaction(tx *transaction.Transaction, state *state.Stat
 	if err != nil {
 		return errors.New("pubkey can't be loaded: " + err.Error())
 	}
-	log.Printf("verify signature %v of %v", tx.Signature, data.SenderID)
-	log.Printf("data: %+v (%T)", data, data)
 	if err = tx.Verify(k); err != nil {
 		return errors.New("tx can't be verified: " + err.Error())
 	}
@@ -51,6 +48,9 @@ func checkSecretUpdateTransaction(tx *transaction.Transaction, state *state.Stat
 	}
 	if _, ok := secret.Shares[data.SenderID]; !ok {
 		return errors.New("sender has no share on this secret")
+	}
+	if _, ok := secret.Owners[data.SenderID]; !ok {
+		return errors.New("sender is not owner of this secret")
 	}
 	return nil
 }

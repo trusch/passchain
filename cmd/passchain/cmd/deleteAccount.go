@@ -30,9 +30,10 @@ import (
 
 // deleteAccountCmd represents the deleteAccount command
 var deleteAccountCmd = &cobra.Command{
-	Use:   "delete",
-	Short: "delete an account",
-	Long:  `Delete a account.`,
+	Use:     "delete",
+	Aliases: []string{"remove", "del"},
+	Short:   "delete an account",
+	Long:    `Delete a account.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cli := getCli()
 		id := viper.GetString("id")

@@ -41,6 +41,9 @@ func checkSecretShareTransaction(tx *transaction.Transaction, state *state.State
 	if _, ok := secret.Shares[data.SenderID]; !ok {
 		return errors.New("sender has no share on this secret")
 	}
+	if _, ok := secret.Owners[data.SenderID]; !ok {
+		return errors.New("sender is not owner of this secret")
+	}
 	if _, ok := secret.Shares[data.AccountID]; ok {
 		return errors.New("share receiver already has a share on this secret")
 	}
