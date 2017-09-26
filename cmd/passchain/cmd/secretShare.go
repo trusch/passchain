@@ -26,7 +26,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/trusch/passchain/crypto"
 )
 
 // secretShareCmd represents the secretShare command
@@ -35,49 +34,19 @@ var secretShareCmd = &cobra.Command{
 	Short: "share a secret",
 	Long:  `Share a secret with another account.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cli := getCli()
-		sid := viper.GetString("sid")
-		if len(args) > 0 {
+		sid, _ := cmd.Flags().GetString("sid")
+		if len(args) > 0 && sid == "" {
 			sid = args[0]
 		}
-		with := viper.GetString("with")
-		if len(args) > 1 {
+		with, _ := cmd.Flags().GetString("with")
+		if len(args) > 1 && with == "" {
 			with = args[1]
 		}
-		secret, err := cli.GetSecret(sid)
-		if err != nil {
+		api := getAPI()
+		if err := api.ShareSecret(sid, with, viper.GetBool("owner")); err != nil {
 			log.Fatal(err)
 		}
-		encryptedAESKey, ok := secret.Shares[cli.AccountID]
-		if !ok {
-			log.Fatal("no share for us on this secret")
-		}
-		k := getKey()
-		aesKey, err := k.DecryptString(encryptedAESKey)
-		if err != nil {
-			log.Fatal(err)
-		}
-		acc, err := cli.GetAccount(with)
-		if err != nil {
-			log.Print("can not find account " + with)
-			log.Fatal(err)
-		}
-		otherKey, err := crypto.NewFromStrings(acc.PubKey, "")
-		if err != nil {
-			log.Fatal(err)
-		}
-		otherEncrptedAESKey, err := otherKey.EncryptToString(aesKey)
-		if err != nil {
-			log.Fatal(err)
-		}
-		secret.Shares[with] = otherEncrptedAESKey
-		if viper.GetBool("owner") {
-			secret.Owners[with] = true
-		}
-		err = cli.UpdateSecret(secret)
-		if err != nil {
-			log.Fatal(err)
-		}
+		log.Printf("successfully shared %v with %v", sid, with)
 	},
 }
 

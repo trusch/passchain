@@ -33,18 +33,18 @@ import (
 	"github.com/trusch/passchain/transaction"
 )
 
-type Client struct {
+type BaseClient struct {
 	Key       *crypto.Key
 	AccountID string
 	tm        client.Client
 }
 
-func NewHTTPClient(endpoint string, key *crypto.Key, account string) *Client {
+func NewHTTPClient(endpoint string, key *crypto.Key, account string) *BaseClient {
 	tm := client.NewHTTP(endpoint, "/websocket")
-	return &Client{key, account, tm}
+	return &BaseClient{key, account, tm}
 }
 
-func (c *Client) AddAccount(acc *state.Account) error {
+func (c *BaseClient) AddAccount(acc *state.Account) error {
 	tx := transaction.New(transaction.AccountAdd, &transaction.AccountAddData{Account: acc})
 	bs, _ := tx.ToBytes()
 	res, err := c.tm.BroadcastTxCommit(types.Tx(bs))
@@ -60,7 +60,7 @@ func (c *Client) AddAccount(acc *state.Account) error {
 	return nil
 }
 
-func (c *Client) DelAccount(id string) error {
+func (c *BaseClient) DelAccount(id string) error {
 	tx := transaction.New(transaction.AccountDel, &transaction.AccountDelData{ID: id})
 	if err := tx.Sign(c.Key); err != nil {
 		return err
@@ -79,7 +79,7 @@ func (c *Client) DelAccount(id string) error {
 	return nil
 }
 
-func (c *Client) GiveReputation(from, to string, value int) error {
+func (c *BaseClient) GiveReputation(from, to string, value int) error {
 	tx := transaction.New(transaction.ReputationGive, &transaction.ReputationGiveData{
 		From:  from,
 		To:    to,
@@ -102,7 +102,7 @@ func (c *Client) GiveReputation(from, to string, value int) error {
 	return nil
 }
 
-func (c *Client) GetAccount(id string) (*state.Account, error) {
+func (c *BaseClient) GetAccount(id string) (*state.Account, error) {
 	resp, err := c.tm.ABCIQuery("/account", []byte(id), false)
 	if err != nil {
 		return nil, err
@@ -112,12 +112,13 @@ func (c *Client) GetAccount(id string) (*state.Account, error) {
 	}
 	acc := &state.Account{}
 	if err = json.Unmarshal(resp.Value, acc); err != nil {
+		log.Printf("request account but got rubbish: %v", string(resp.Value))
 		return nil, err
 	}
 	return acc, nil
 }
 
-func (c *Client) ListAccounts() ([]*state.Account, error) {
+func (c *BaseClient) ListAccounts() ([]*state.Account, error) {
 	resp, err := c.tm.ABCIQuery("/account", nil, false)
 	if err != nil {
 		log.Print(err)
@@ -133,7 +134,7 @@ func (c *Client) ListAccounts() ([]*state.Account, error) {
 	return acc, nil
 }
 
-func (c *Client) ListSecrets() ([]*state.Secret, error) {
+func (c *BaseClient) ListSecrets() ([]*state.Secret, error) {
 	resp, err := c.tm.ABCIQuery("/secret", nil, false)
 	if err != nil {
 		log.Print(err)
@@ -149,7 +150,7 @@ func (c *Client) ListSecrets() ([]*state.Secret, error) {
 	return acc, nil
 }
 
-func (c *Client) GetSecret(id string) (*state.Secret, error) {
+func (c *BaseClient) GetSecret(id string) (*state.Secret, error) {
 	resp, err := c.tm.ABCIQuery("/secret", []byte(id), false)
 	if err != nil {
 		return nil, err
@@ -164,7 +165,7 @@ func (c *Client) GetSecret(id string) (*state.Secret, error) {
 	return acc, nil
 }
 
-func (c *Client) AddSecret(acc *state.Secret) error {
+func (c *BaseClient) AddSecret(acc *state.Secret) error {
 	tx := transaction.New(transaction.SecretAdd, &transaction.SecretAddData{Secret: acc})
 	bs, _ := tx.ToBytes()
 	res, err := c.tm.BroadcastTxCommit(types.Tx(bs))
@@ -180,7 +181,7 @@ func (c *Client) AddSecret(acc *state.Secret) error {
 	return nil
 }
 
-func (c *Client) DelSecret(id string) error {
+func (c *BaseClient) DelSecret(id string) error {
 	tx := transaction.New(transaction.SecretDel, &transaction.SecretDelData{
 		ID:       id,
 		SenderID: c.AccountID,
@@ -202,7 +203,7 @@ func (c *Client) DelSecret(id string) error {
 	return nil
 }
 
-func (c *Client) UpdateSecret(acc *state.Secret) error {
+func (c *BaseClient) UpdateSecret(acc *state.Secret) error {
 	tx := transaction.New(transaction.SecretUpdate, &transaction.SecretUpdateData{
 		Secret:   acc,
 		SenderID: c.AccountID,

@@ -33,21 +33,10 @@ var listSecretCmd = &cobra.Command{
 	Short: "list secrets",
 	Long:  `List secrets and decrypt if possible.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cli := getCli()
-		secrets, err := cli.ListSecrets()
+		api := getAPI()
+		secrets, err := api.ListSecrets("")
 		if err != nil {
 			log.Fatal(err)
-		}
-		for _, s := range secrets {
-			if encryptedKey, ok := s.Shares[cli.AccountID]; ok {
-				key, e := cli.Key.DecryptString(encryptedKey)
-				if e != nil {
-					log.Fatal(e)
-				}
-				if e = s.Decrypt(key); e != nil {
-					log.Fatal(e)
-				}
-			}
 		}
 		print(secrets)
 	},

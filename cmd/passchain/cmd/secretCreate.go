@@ -26,7 +26,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/trusch/passchain/state"
 )
 
 var secretData string
@@ -38,7 +37,6 @@ var secretAddCmd = &cobra.Command{
 	Short:   "create a secret",
 	Long:    `Create a secret.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cli := getCli()
 		sid := viper.GetString("sid")
 		if len(args) > 0 {
 			sid = args[0]
@@ -50,26 +48,8 @@ var secretAddCmd = &cobra.Command{
 		if sid == "" || data == "" {
 			log.Fatal("you must specify --sid and --data")
 		}
-		ownID := cli.AccountID
-		s := &state.Secret{
-			ID:     sid,
-			Value:  data,
-			Shares: make(map[string]string),
-			Owners: map[string]bool{
-				ownID: true,
-			},
-		}
-		aesKey, err := s.Encrypt()
-		if err != nil {
-			log.Fatal(err)
-		}
-		k := cli.Key
-		encryptedAESKey, err := k.EncryptToString(aesKey)
-		if err != nil {
-			log.Fatal(err)
-		}
-		s.Shares[ownID] = encryptedAESKey
-		if err := cli.AddSecret(s); err != nil {
+		api := getAPI()
+		if err := api.CreateSecret(sid, data); err != nil {
 			log.Fatal(err)
 		}
 		log.Printf("created secret %v", sid)

@@ -34,17 +34,16 @@ var trustCmd = &cobra.Command{
 	Short: "give reputation to an account",
 	Long:  `Trust allows you to give reputation to an account. Valid values are from -3 to +3.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cli := getCli()
-		from := cli.AccountID
 		to := viper.GetString("to")
 		if len(args) > 0 {
 			to = args[0]
 		}
 		value := viper.GetInt("value")
-		err := cli.GiveReputation(from, to, value)
-		if err != nil {
+		api := getAPI()
+		if err := api.GiveReputation(to, value); err != nil {
 			log.Fatal(err)
 		}
+		log.Printf("successfully give %v reputation to %v", value, to)
 	},
 }
 

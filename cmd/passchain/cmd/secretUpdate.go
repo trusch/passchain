@@ -34,8 +34,6 @@ var secretUpdateCmd = &cobra.Command{
 	Short: "update a secret",
 	Long:  `Update a secrets value but retain the shares`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cli := getCli()
-		key := cli.Key
 		sid := viper.GetString("sid")
 		if sid == "" && len(args) > 0 {
 			sid = args[0]
@@ -47,20 +45,8 @@ var secretUpdateCmd = &cobra.Command{
 		if sid == "" || data == "" {
 			log.Fatal("you must specify --sid and --data")
 		}
-		sec, err := cli.GetSecret(sid)
-		if err != nil {
-			log.Fatalf("failed to get secret: %v", err)
-		}
-		aesKey, err := key.DecryptString(sec.Shares[cli.AccountID])
-		if err != nil {
-			log.Fatalf("failed to decrypt secret: %v", err)
-		}
-		sec.Value = data
-		err = sec.EncryptWithKey(aesKey)
-		if err != nil {
-			log.Fatal(err)
-		}
-		if err := cli.UpdateSecret(sec); err != nil {
+		api := getAPI()
+		if err := api.UpdateSecret(sid, data); err != nil {
 			log.Fatal(err)
 		}
 		log.Printf("updated secret %v", sid)

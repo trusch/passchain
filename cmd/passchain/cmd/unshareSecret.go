@@ -34,7 +34,6 @@ var secretUnshareCmd = &cobra.Command{
 	Short: "unshare a secret",
 	Long:  `Unshare a secret with another account.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cli := getCli()
 		sid := viper.GetString("sid")
 		if len(args) > 0 {
 			sid = args[0]
@@ -43,16 +42,11 @@ var secretUnshareCmd = &cobra.Command{
 		if len(args) > 1 {
 			with = args[1]
 		}
-		secret, err := cli.GetSecret(sid)
-		if err != nil {
+		api := getAPI()
+		if err := api.UnshareSecret(sid, with); err != nil {
 			log.Fatal(err)
 		}
-		delete(secret.Shares, with)
-		delete(secret.Owners, with)
-		if err = cli.UpdateSecret(secret); err != nil {
-			log.Fatal(err)
-		}
-		log.Printf("successfully removed %v from shares of secret %v", with, secret.ID)
+		log.Printf("successfully removed %v from shares of secret %v", with, sid)
 	},
 }
 

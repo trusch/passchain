@@ -35,7 +35,6 @@ var deleteAccountCmd = &cobra.Command{
 	Short:   "delete an account",
 	Long:    `Delete a account.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cli := getCli()
 		id := viper.GetString("id")
 		if len(args) > 0 {
 			id = args[0]
@@ -43,7 +42,8 @@ var deleteAccountCmd = &cobra.Command{
 		if id == "" {
 			log.Fatal("you must specify --id")
 		}
-		if err := cli.DelAccount(id); err != nil {
+		api := getAPI()
+		if err := api.DeleteAccount(id); err != nil {
 			log.Fatal(err)
 		}
 		log.Print("successfully deleted ", id)

@@ -69,6 +69,7 @@ func init() {
 	RootCmd.PersistentFlags().String("id", "", "id of account")
 	RootCmd.PersistentFlags().String("format", "yaml", "output format")
 	RootCmd.PersistentFlags().String("as", "", "group account to use")
+	RootCmd.PersistentFlags().String("endpoint", "http://localhost:46657", "tendermint endpoint")
 
 	viper.BindPFlags(RootCmd.PersistentFlags())
 	viper.BindEnv("id", "PASSCHAIN_ID")
@@ -102,6 +103,21 @@ func initConfig() {
 	}
 }
 
+func getAPI() client.API {
+	account := viper.GetString("id")
+	key := getKey()
+	endpoint := viper.GetString("endpoint")
+	api := client.NewAPI(endpoint, key, account)
+	if as := viper.GetString("as"); as != "" {
+		a, err := api.As(as)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return a
+	}
+	return api
+}
+
 func getKey() *crypto.Key {
 	k, err := crypto.NewFromStrings(viper.GetString("public-key"), viper.GetString("private-key"))
 	if err != nil {
@@ -113,41 +129,6 @@ func getKey() *crypto.Key {
 		return k
 	}
 	return k
-}
-
-func getCli() *client.Client {
-	ownID := viper.GetString("id")
-	cli := client.NewHTTPClient("http://localhost:46657", getKey(), ownID)
-	if as := viper.GetString("as"); as != "" {
-		asAccount, err := cli.GetAccount(as)
-		if err != nil {
-			log.Fatal("cannot find account: ", err)
-		}
-		privkeySecret, err := cli.GetSecret(as)
-		if err != nil {
-			log.Fatal("cannot find shared account secret: ", err)
-		}
-		encryptedAESKey, ok := privkeySecret.Shares[ownID]
-		if !ok {
-			log.Fatal("no share for us on this secret")
-		}
-		k := getKey()
-		aesKey, err := k.DecryptString(encryptedAESKey)
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = privkeySecret.Decrypt(aesKey)
-		if err != nil {
-			log.Fatal(err)
-		}
-		key, err := crypto.NewFromStrings(asAccount.PubKey, string(privkeySecret.Value))
-		if err != nil {
-			log.Fatal(err)
-		}
-		cli.Key = key
-		cli.AccountID = as
-	}
-	return cli
 }
 
 func print(data interface{}) {

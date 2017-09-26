@@ -27,8 +27,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/trusch/passchain/crypto"
-	"github.com/trusch/passchain/state"
 )
 
 // createAccountCmd represents the createAccount command
@@ -45,20 +43,16 @@ var createAccountCmd = &cobra.Command{
 		if len(args) > 0 {
 			id = args[0]
 		}
-		cli := getCli()
-		key, err := crypto.CreateKeyPair()
+		api := getAPI()
+		pub, priv, err := api.CreateAccount(id)
 		if err != nil {
-			log.Fatal(err)
-		}
-		cli.Key = key
-		if err := cli.AddAccount(&state.Account{ID: id, PubKey: key.GetPubString()}); err != nil {
 			log.Fatal("account creation failed")
 		}
 		log.Print("successfully created account ", id)
 		log.Print("you may wish to set these env variables:")
 		fmt.Printf("export PASSCHAIN_ID=%v\n", id)
-		fmt.Printf("export PASSCHAIN_PUBLIC_KEY=%v\n", cli.Key.GetPubString())
-		fmt.Printf("export PASSCHAIN_PRIVATE_KEY=%v\n", cli.Key.GetPrivString())
+		fmt.Printf("export PASSCHAIN_PUBLIC_KEY=%v\n", pub)
+		fmt.Printf("export PASSCHAIN_PRIVATE_KEY=%v\n", priv)
 	},
 }
 

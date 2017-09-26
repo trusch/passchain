@@ -35,7 +35,6 @@ var secretDelCmd = &cobra.Command{
 	Short:   "delete a secret",
 	Long:    `Delete a secret.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cli := getCli()
 		id := viper.GetString("sid")
 		if len(args) > 0 {
 			id = args[0]
@@ -43,7 +42,8 @@ var secretDelCmd = &cobra.Command{
 		if id == "" {
 			log.Fatal("you must specify --sid")
 		}
-		if err := cli.DelSecret(id); err != nil {
+		api := getAPI()
+		if err := api.DeleteSecret(id); err != nil {
 			log.Fatal(err)
 		}
 		log.Print("successfully deleted secret ", id)

@@ -39,21 +39,8 @@ var secretGetCmd = &cobra.Command{
 		if len(args) > 0 {
 			sid = args[0]
 		}
-		cli := getCli()
-		secret, err := cli.GetSecret(sid)
-		if err != nil {
-			log.Fatal(err)
-		}
-		encryptedAESKey, ok := secret.Shares[cli.AccountID]
-		if !ok {
-			log.Fatal("no share for us on this secret")
-		}
-		k := cli.Key
-		aesKey, err := k.DecryptString(encryptedAESKey)
-		if err != nil {
-			log.Fatal(err)
-		}
-		err = secret.Decrypt(aesKey)
+		api := getAPI()
+		secret, err := api.GetSecret(sid)
 		if err != nil {
 			log.Fatal(err)
 		}

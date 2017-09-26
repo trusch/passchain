@@ -34,12 +34,12 @@ var getAccountCmd = &cobra.Command{
 	Short: "get account data",
 	Long:  `Get account data.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cli := getCli()
 		id := viper.GetString("id")
 		if len(args) > 0 {
 			id = args[0]
 		}
-		acc, err := cli.GetAccount(id)
+		api := getAPI()
+		acc, err := api.GetAccount(id)
 		if err != nil {
 			log.Fatal(err)
 		}

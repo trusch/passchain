@@ -33,8 +33,8 @@ var listAccountCmd = &cobra.Command{
 	Short: "list accounts",
 	Long:  `List accounts.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		cli := getCli()
-		accs, err := cli.ListAccounts()
+		api := getAPI()
+		accs, err := api.ListAccounts("")
 		if err != nil {
 			log.Fatal(err)
 		}
