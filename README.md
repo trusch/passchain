@@ -63,7 +63,7 @@ passchain secrets create my-secret "this is secret"
 passchain secrets get my-secret
 
 # share secret with bob
-passchain secrets share s1 --with bob
+passchain secrets share my-secret --with bob
 ```
 
 ## Howto use groups
