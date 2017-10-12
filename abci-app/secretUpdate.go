@@ -52,6 +52,9 @@ func checkSecretUpdateTransaction(tx *transaction.Transaction, state *state.Stat
 	if _, ok := secret.Owners[data.SenderID]; !ok {
 		return errors.New("sender is not owner of this secret")
 	}
+	if err := tx.VerifyProofOfWork(transaction.DefaultProofOfWorkCost); err != nil {
+		return err
+	}
 	return nil
 }
 

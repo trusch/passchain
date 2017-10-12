@@ -22,7 +22,10 @@
 package transaction
 
 import (
+	"bytes"
+	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"sort"
 	"time"
 
@@ -35,6 +38,7 @@ type Transaction struct {
 	Type      TransactionType `json:"type"`
 	Timestamp time.Time       `json:"timestamp"`
 	Signature string          `json:"signature"`
+	Nonce     uint32          `json:"nonce"`
 	Data      interface{}     `json:"data"`
 }
 
@@ -53,6 +57,8 @@ const (
 	SecretDel      TransactionType = "secret-del"
 	SecretShare    TransactionType = "secret-share"
 )
+
+const DefaultProofOfWorkCost byte = 16
 
 func (t *Transaction) FromBytes(bs []byte) error {
 	return json.Unmarshal(bs, t)
@@ -90,8 +96,31 @@ func (t *Transaction) Verify(key *crypto.Key) error {
 	return key.Verify(hash, t.Signature)
 }
 
+func (t *Transaction) ProofOfWork(cost byte) error {
+	for round := 0; round < (1 << 32); round++ {
+		t.Nonce = uint32(round)
+		if err := t.VerifyProofOfWork(cost); err == nil {
+			return nil
+		}
+	}
+	return errors.New("can not find pow")
+}
+
+func (t *Transaction) VerifyProofOfWork(cost byte) error {
+	hasher := sha3.New512()
+	hasher.Write(t.Hash())
+	binary.Write(hasher, binary.LittleEndian, t.Nonce)
+	tip := uint64(0)
+	buf := bytes.NewBuffer(hasher.Sum(nil))
+	binary.Read(buf, binary.LittleEndian, &tip)
+	if tip<<(64-cost) == 0 {
+		return nil
+	}
+	return errors.New("failed to validate proof of work")
+}
+
 func New(t TransactionType, data interface{}) *Transaction {
-	return &Transaction{t, time.Now(), "", data}
+	return &Transaction{t, time.Now(), "", 0, data}
 }
 
 func hashStringMap(m map[string]interface{}) []byte {

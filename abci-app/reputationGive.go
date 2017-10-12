@@ -34,6 +34,7 @@ func checkReputationGiveTransaction(tx *transaction.Transaction, state *state.St
 	if err := mapstructure.Decode(tx.Data, data); err != nil {
 		return err
 	}
+	tx.Data = data
 	if !state.HasAccount(data.From) {
 		return errors.New("reject give-rep because id doesnt exist: " + data.From)
 	}
@@ -49,6 +50,9 @@ func checkReputationGiveTransaction(tx *transaction.Transaction, state *state.St
 	}
 	if err = tx.Verify(k); err != nil {
 		return errors.New("reject give-rep because signature cant be verified")
+	}
+	if err := tx.VerifyProofOfWork(transaction.DefaultProofOfWorkCost); err != nil {
+		return err
 	}
 	return nil
 }

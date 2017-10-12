@@ -35,11 +35,14 @@ func checkAccountAddTransaction(tx *transaction.Transaction, state *state.State)
 	if err := mapstructure.Decode(tx.Data, data); err != nil {
 		return err
 	}
+	tx.Data = data
 	if state.HasAccount(data.Account.ID) {
 		return errors.New("account exists")
 	}
-	_, err := crypto.NewFromStrings(data.Account.PubKey, "")
-	if err != nil {
+	if _, err := crypto.NewFromStrings(data.Account.PubKey, ""); err != nil {
+		return err
+	}
+	if err := tx.VerifyProofOfWork(transaction.DefaultProofOfWorkCost); err != nil {
 		return err
 	}
 	return nil

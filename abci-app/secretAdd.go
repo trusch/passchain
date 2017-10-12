@@ -34,6 +34,7 @@ func checkSecretAddTransaction(tx *transaction.Transaction, state *state.State) 
 	if err := mapstructure.Decode(tx.Data, data); err != nil {
 		return err
 	}
+	tx.Data = data
 	if state.HasSecret(data.Secret.ID) {
 		return errors.New("secret exists")
 	}
@@ -42,6 +43,9 @@ func checkSecretAddTransaction(tx *transaction.Transaction, state *state.State) 
 	}
 	if len(data.Secret.Owners) == 0 {
 		return errors.New("no owners supplied")
+	}
+	if err := tx.VerifyProofOfWork(transaction.DefaultProofOfWorkCost); err != nil {
+		return err
 	}
 	return nil
 }

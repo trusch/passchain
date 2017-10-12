@@ -34,6 +34,7 @@ func checkSecretDelTransaction(tx *transaction.Transaction, state *state.State) 
 	if err := mapstructure.Decode(tx.Data, data); err != nil {
 		return err
 	}
+	tx.Data = data
 	if !state.HasSecret(data.ID) {
 		return errors.New("secret doesn't exists")
 	}
@@ -53,6 +54,9 @@ func checkSecretDelTransaction(tx *transaction.Transaction, state *state.State) 
 	}
 	if err = tx.Verify(k); err != nil {
 		return errors.New("tx can't be verified: " + err.Error())
+	}
+	if err := tx.VerifyProofOfWork(transaction.DefaultProofOfWorkCost); err != nil {
+		return err
 	}
 	return nil
 }

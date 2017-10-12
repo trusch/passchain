@@ -46,7 +46,7 @@ var createAccountCmd = &cobra.Command{
 		api := getAPI()
 		pub, priv, err := api.CreateAccount(id)
 		if err != nil {
-			log.Fatal("account creation failed")
+			log.Fatal("account creation failed: ", err)
 		}
 		log.Print("successfully created account ", id)
 		log.Print("you may wish to set these env variables:")

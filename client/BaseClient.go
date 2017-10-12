@@ -46,6 +46,9 @@ func NewHTTPClient(endpoint string, key *crypto.Key, account string) *BaseClient
 
 func (c *BaseClient) AddAccount(acc *state.Account) error {
 	tx := transaction.New(transaction.AccountAdd, &transaction.AccountAddData{Account: acc})
+	if err := tx.ProofOfWork(transaction.DefaultProofOfWorkCost); err != nil {
+		return err
+	}
 	bs, _ := tx.ToBytes()
 	res, err := c.tm.BroadcastTxCommit(types.Tx(bs))
 	if err != nil {
@@ -62,6 +65,9 @@ func (c *BaseClient) AddAccount(acc *state.Account) error {
 
 func (c *BaseClient) DelAccount(id string) error {
 	tx := transaction.New(transaction.AccountDel, &transaction.AccountDelData{ID: id})
+	if err := tx.ProofOfWork(transaction.DefaultProofOfWorkCost); err != nil {
+		return err
+	}
 	if err := tx.Sign(c.Key); err != nil {
 		return err
 	}
@@ -85,6 +91,9 @@ func (c *BaseClient) GiveReputation(from, to string, value int) error {
 		To:    to,
 		Value: value,
 	})
+	if err := tx.ProofOfWork(transaction.DefaultProofOfWorkCost); err != nil {
+		return err
+	}
 	if err := tx.Sign(c.Key); err != nil {
 		return err
 	}
@@ -167,6 +176,9 @@ func (c *BaseClient) GetSecret(id string) (*state.Secret, error) {
 
 func (c *BaseClient) AddSecret(acc *state.Secret) error {
 	tx := transaction.New(transaction.SecretAdd, &transaction.SecretAddData{Secret: acc})
+	if err := tx.ProofOfWork(transaction.DefaultProofOfWorkCost); err != nil {
+		return err
+	}
 	bs, _ := tx.ToBytes()
 	res, err := c.tm.BroadcastTxCommit(types.Tx(bs))
 	if err != nil {
@@ -186,6 +198,9 @@ func (c *BaseClient) DelSecret(id string) error {
 		ID:       id,
 		SenderID: c.AccountID,
 	})
+	if err := tx.ProofOfWork(transaction.DefaultProofOfWorkCost); err != nil {
+		return err
+	}
 	if err := tx.Sign(c.Key); err != nil {
 		return err
 	}
@@ -208,6 +223,9 @@ func (c *BaseClient) UpdateSecret(acc *state.Secret) error {
 		Secret:   acc,
 		SenderID: c.AccountID,
 	})
+	if err := tx.ProofOfWork(transaction.DefaultProofOfWorkCost); err != nil {
+		return err
+	}
 	if err := tx.Sign(c.Key); err != nil {
 		return err
 	}
